@@ -16,7 +16,12 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5162",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DATABASE_USERNAME": "sa",
+        "DATABASE_PASSWORD": "Password123#",
+        "DATABASE_NAME": "PersonalFinanceManagementDatabase",
+        "DATABASE_PORT": "5555",
+        "DATABASE_HOST": "localhost"
       }
     },
     "IIS Express": {
