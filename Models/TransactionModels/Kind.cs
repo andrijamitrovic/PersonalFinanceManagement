@@ -2,19 +2,19 @@
 {
     public enum Kind
     {
-        dep, 
-        wdw, 
-        pmt, 
-        fee, 
-        inc, 
-        rev, 
-        adj, 
-        lnd, 
-        lnr, 
-        fcx, 
-        aop, 
-        acl, 
-        spl, 
-        sal
+        Dep, 
+        Wdw, 
+        Pmt, 
+        Fee, 
+        Inc, 
+        Rev, 
+        Adj, 
+        Lnd, 
+        Lnr, 
+        Fcx, 
+        Aop, 
+        Acl, 
+        Spl, 
+        Sal,
     }
 }

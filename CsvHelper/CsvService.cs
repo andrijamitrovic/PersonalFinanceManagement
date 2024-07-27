@@ -1,8 +1,9 @@
 ﻿
 using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
+using PersonalFinanceManagement.Models.TransactionModels;
 using System.Globalization;
-using System.Transactions;
 
 namespace PersonalFinanceManagement.CsvHelper
 {
@@ -14,24 +15,26 @@ namespace PersonalFinanceManagement.CsvHelper
         {
             _logger = logger;
         }
-        public IEnumerable<T> ReadCsv<T>(Stream stream)
+        public (List<string>, IEnumerable<T>) ReadCsv<T>(Stream stream)
         {
-            List<string> badTransactions = new List<string>();
+            List<string> badRecords = new List<string>();
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 PrepareHeaderForMatch = args => args.Header.Replace("-", "").ToLower(),
                 ReadingExceptionOccurred = args =>
                 {
-                    badTransactions.Add(args.Exception.Message.Split(":").Last().Trim());
-                    _logger.LogWarning(message: "[skipped][{row}]",args.Exception.Message.Split(":").Last().Trim());
+                    badRecords.Add($"[bad row][{args.Exception.Message.Split(":").Last().Trim()}]");
+                    _logger.LogWarning(message: $"[bad row][{args.Exception.Message.Split(":").Last().Trim()}]");
                     return false;
                 }
-
+                
             };
             var reader = new StreamReader(stream);
             var csv = new CsvReader(reader, config);
+
+           // csv.Context.TypeConverterOptionsCache.GetOptions<Enum>().EnumIgnoreCase = true;
             var records = csv.GetRecords<T>();
-            return records;
+            return (badRecords, records);
         }
     }
 }

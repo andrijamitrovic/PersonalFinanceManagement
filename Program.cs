@@ -22,6 +22,7 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddScoped<ICsvService, CsvService>();
+builder.Services.AddScoped<IRequestErrorService, RequestErrorService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -58,8 +59,8 @@ app.Run();
 
 string CreateConnectionString(IConfiguration configuration)
 {
-    var username = Environment.GetEnvironmentVariable("DATABASE_USERNAME") ?? "sa";
-    var pass = Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "Password123#";
+    var username = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
+    var pass = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
     var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME") ?? "PersonalFinanceManagementDatabase";
     var host = Environment.GetEnvironmentVariable("DATABASE_HOST") ?? "localhost";
     var port = Environment.GetEnvironmentVariable("DATABASE_PORT") ?? "5555";
