@@ -5,29 +5,26 @@ using PersonalFinanceManagement.Database.Entities;
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
 
-namespace PersonalFinanceManagement.Database.Repositories
+namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositories
 {
     public class TransactionRepository : ITransactionRepository
     {
-        TransactionDbContext _dbContext;
+        PFMDbContext _dbContext;
         ILogger<TransactionEntity> _logger;
 
-        public TransactionRepository(TransactionDbContext dbContext, ILogger<TransactionEntity> logger)
+        public TransactionRepository(PFMDbContext dbContext, ILogger<TransactionEntity> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
-        private bool CheckIfTransactionExists(string transactionId)
-        {
-            return _dbContext.Transactions.Any(t => t.Id == transactionId);
-        }
-        public async Task<List<string>> CreateTransactions(IEnumerable<TransactionEntity> transactions)
+
+        public async Task<List<string>> ImportTransactionsAsync(IEnumerable<TransactionEntity> transactions)
         {
             List<string> badTransactions = new List<string>();
             foreach (var transaction in transactions)
             {
 
-                if ((CheckIfTransactionExists(transaction.Id)) == false)
+                if (_dbContext.Transactions.Any(t => t.Id == transaction.Id) == false)
                 {
                     await _dbContext.AddAsync(transaction);
                 }
@@ -51,7 +48,7 @@ namespace PersonalFinanceManagement.Database.Repositories
             var totalCount = query.Count();
             var totalPages = (int)Math.Ceiling(totalCount * 1.0 / pageSize);
 
-            if (!String.IsNullOrEmpty(sortBy))
+            if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
                 {
@@ -74,11 +71,11 @@ namespace PersonalFinanceManagement.Database.Repositories
             {
                 query = query.Where(x => transactionKind.Contains(x.Kind));
             }
-            if(startDate != null)
+            if (startDate != null)
             {
                 query = query.Where(x => x.Date > startDate);
             }
-            if(endDate != null)
+            if (endDate != null)
             {
                 query = query.Where(x => x.Date < endDate);
             }
@@ -96,6 +93,18 @@ namespace PersonalFinanceManagement.Database.Repositories
                 SortOrder = sortOrder,
                 Items = products
             };
+        }
+
+        public async Task<string> CategorizeTransactionAsync(string id, string catCode)
+        {
+            var transactionToUpdate = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id == id);
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Code == catCode);
+            if (transactionToUpdate != null && category != null)
+            {
+                transactionToUpdate.CatCode = catCode;
+                await _dbContext.SaveChangesAsync();
+            }
+            return "123";
         }
     }
 }

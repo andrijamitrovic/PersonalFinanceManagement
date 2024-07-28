@@ -2,11 +2,12 @@
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
 
-namespace PersonalFinanceManagement.Services
+namespace PersonalFinanceManagement.Services.TransactionServices
 {
     public interface ITransactionService
     {
-        Task<string> ImportTransactions(IFormFile file);
+        Task<string> ImportTransactionsAsync(IFormFile file);
         Task<PagedSortedFilteredList<Transaction>> GetTransactionsAsync(List<Kind>? transactionKind, DateTime? startDate, DateTime? endDate, int page, int pageSize, SortOrder sortOrder, string? sortBy);
+        Task<string> CategorizeTransactionAsync(string id, string catCode);
     }
 }

@@ -31,8 +31,7 @@ namespace PersonalFinanceManagement.CsvHelper
             };
             var reader = new StreamReader(stream);
             var csv = new CsvReader(reader, config);
-
-           // csv.Context.TypeConverterOptionsCache.GetOptions<Enum>().EnumIgnoreCase = true;
+            csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("");
             var records = csv.GetRecords<T>();
             return (badRecords, records);
         }

@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
-using PersonalFinanceManagement.Services;
+using PersonalFinanceManagement.Services.ErrorServices;
+using PersonalFinanceManagement.Services.TransactionServices;
 using System.Text;
 
 namespace PersonalFinanceManagement.Controllers
@@ -43,9 +44,16 @@ namespace PersonalFinanceManagement.Controllers
                 return BadRequest(errors);
             }
 
-            var badTransactions = await _transactionsService.ImportTransactions(file);
+            var badTransactions = await _transactionsService.ImportTransactionsAsync(file);
 
             return File(Encoding.UTF8.GetBytes(badTransactions), "text/plain", "badTransactions.txt");
+        }
+
+        [HttpPost("{id}/categorize")]
+        public async Task<IActionResult> CategorizeTransactionAsync([FromRoute] string id, [FromBody] string catCode)
+        {
+            await _transactionsService.CategorizeTransactionAsync(id, catCode);
+            return Ok();
         }
     }
 }

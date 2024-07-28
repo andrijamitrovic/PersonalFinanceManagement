@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PersonalFinanceManagement.CsvHelper;
 using PersonalFinanceManagement.Database;
-using PersonalFinanceManagement.Database.Repositories;
-using PersonalFinanceManagement.Services;
+using PersonalFinanceManagement.Database.Repositories.CategoryRepositories;
+using PersonalFinanceManagement.Database.Repositories.TransactionRepositories;
+using PersonalFinanceManagement.Services.CategoryServices;
+using PersonalFinanceManagement.Services.ErrorServices;
+using PersonalFinanceManagement.Services.TransactionServices;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -25,6 +28,8 @@ builder.Services.AddScoped<ICsvService, CsvService>();
 builder.Services.AddScoped<IRequestErrorService, RequestErrorService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -36,7 +41,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<TransactionDbContext>(opt =>
+builder.Services.AddDbContext<PFMDbContext>(opt =>
 {
     opt.UseNpgsql(CreateConnectionString(builder.Configuration));
 });
@@ -59,8 +64,8 @@ app.Run();
 
 string CreateConnectionString(IConfiguration configuration)
 {
-    var username = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
-    var pass = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+    var username = Environment.GetEnvironmentVariable("DATABASE_USERNAME") ?? "sa";
+    var pass = Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "Password123#";
     var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME") ?? "PersonalFinanceManagementDatabase";
     var host = Environment.GetEnvironmentVariable("DATABASE_HOST") ?? "localhost";
     var port = Environment.GetEnvironmentVariable("DATABASE_PORT") ?? "5555";
@@ -73,7 +78,8 @@ string CreateConnectionString(IConfiguration configuration)
         Database = databaseName,
         Password = pass,
         Pooling = true,
-        Timeout = 300
+        Timeout = 300,
+        IncludeErrorDetail = true
     };
 
     return connBuilder.ConnectionString;

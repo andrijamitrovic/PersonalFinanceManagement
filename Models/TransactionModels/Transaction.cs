@@ -15,5 +15,7 @@ namespace PersonalFinanceManagement.Models.TransactionModels
         public int? Mcc { get; set; }
         [EnumIgnoreCase]
         public Kind Kind { get; set; }
+        [Ignore]
+        public string? CatCode { get; set; }
     }
 }

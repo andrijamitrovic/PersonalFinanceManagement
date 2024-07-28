@@ -13,5 +13,7 @@ namespace PersonalFinanceManagement.Database.Entities
         public string Currency { get; set; }
         public int? Mcc { get; set; }
         public Kind Kind { get; set; }
+        public string? CatCode { get; set; }
+        public CategoryEntity Category { get; set; }
     }
 }

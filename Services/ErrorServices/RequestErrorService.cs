@@ -1,6 +1,6 @@
 ﻿using PersonalFinanceManagement.Models;
 
-namespace PersonalFinanceManagement.Services
+namespace PersonalFinanceManagement.Services.ErrorServices
 {
     public class RequestErrorService : IRequestErrorService
     {

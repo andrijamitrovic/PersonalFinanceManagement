@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalFinanceManagement.Database;
@@ -11,12 +10,10 @@ using PersonalFinanceManagement.Database;
 
 namespace PersonalFinanceManagement.Migrations
 {
-    [DbContext(typeof(TransactionDbContext))]
-    [Migration("20240724083924_InitDb")]
-    partial class InitDb
+    [DbContext(typeof(PFMDbContext))]
+    partial class PFMDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,6 +21,28 @@ namespace PersonalFinanceManagement.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("ParentCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("ParentCode");
+
+                    b.ToTable("categories", (string)null);
+                });
 
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionEntity", b =>
                 {
@@ -35,6 +54,10 @@ namespace PersonalFinanceManagement.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<string>("BeneficiaryName")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("CatCode")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
@@ -64,7 +87,34 @@ namespace PersonalFinanceManagement.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CatCode");
+
                     b.ToTable("transactions", (string)null);
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Database.Entities.CategoryEntity", "ParentCategory")
+                        .WithMany("ChildCategories")
+                        .HasForeignKey("ParentCode");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionEntity", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Database.Entities.CategoryEntity", "Category")
+                        .WithMany("Transactions")
+                        .HasForeignKey("CatCode");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
+                {
+                    b.Navigation("ChildCategories");
+
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

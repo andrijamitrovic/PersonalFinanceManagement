@@ -25,6 +25,7 @@ namespace PersonalFinanceManagement.Database.Configurations
             builder.Property(x => x.Currency).HasMaxLength(3).IsFixedLength(true).IsRequired();
             builder.Property(x => x.Mcc);
             builder.Property(x => x.Kind).HasConversion<string>().IsRequired();
+            builder.Property(x => x.CatCode).HasMaxLength(64);
         }
     }
 }
