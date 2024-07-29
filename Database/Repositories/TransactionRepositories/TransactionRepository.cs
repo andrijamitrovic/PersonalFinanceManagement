@@ -95,16 +95,58 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             };
         }
 
-        public async Task<string> CategorizeTransactionAsync(string id, string catCode)
+        public async Task<string> CategorizeTransactionAsync(string id, string catcode)
         {
             var transactionToUpdate = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id == id);
-            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Code == catCode);
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Code == catcode);
             if (transactionToUpdate != null && category != null)
             {
-                transactionToUpdate.CatCode = catCode;
+                transactionToUpdate.CatCode = catcode;
                 await _dbContext.SaveChangesAsync();
             }
             return "123";
+        }
+
+        public async Task SplitTransactionAsync(string id, List<Split> splits)
+        {
+            var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id.Equals(id));
+            
+            if(transaction == null)
+            {
+                return;
+            }
+
+            if(transaction.Splits != null && transaction.Splits.Count > 0)
+            {
+                foreach (var split in transaction.Splits)
+                {
+                    _dbContext.Transactions.Remove(split);
+                }
+            }
+
+            List<TransactionEntity> newTransactions = new List<TransactionEntity>();
+            foreach (Split split in splits)
+            {
+                var newTransaction = new TransactionEntity
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    BeneficiaryName = transaction.BeneficiaryName,
+                    Date = transaction.Date,
+                    Direction = transaction.Direction,
+                    Description = transaction.Description,
+                    Currency = transaction.Currency,
+                    Mcc = transaction.Mcc,
+                    Kind = transaction.Kind,
+                    SplitId = transaction.Id,
+                    Amount = split.Amount,
+                    CatCode = split.Catcode
+                };
+                newTransactions.Add(newTransaction);
+            }
+
+            await _dbContext.AddRangeAsync(newTransactions);
+            await _dbContext.SaveChangesAsync();
+
         }
     }
 }

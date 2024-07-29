@@ -8,6 +8,7 @@ namespace PersonalFinanceManagement.Services.TransactionServices
     {
         Task<string> ImportTransactionsAsync(IFormFile file);
         Task<PagedSortedFilteredList<Transaction>> GetTransactionsAsync(List<Kind>? transactionKind, DateTime? startDate, DateTime? endDate, int page, int pageSize, SortOrder sortOrder, string? sortBy);
-        Task<string> CategorizeTransactionAsync(string id, string catCode);
+        Task<string> CategorizeTransactionAsync(string id, string catcode);
+        Task SplitTransactionAsync(string id, List<Split> splits);
     }
 }

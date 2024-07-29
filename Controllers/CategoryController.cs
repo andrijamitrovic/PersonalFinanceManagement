@@ -28,7 +28,10 @@ namespace PersonalFinanceManagement.Controllers
         public async Task<IActionResult> GetCategoriesAsync([FromQuery] string? parentId = null)
         {
             var categories = await _categoryService.GetCategoriesAsync(parentId);
-            return Ok(categories);
+            return Ok(new
+            {
+                items = categories
+            });
         }
 
         [HttpPost]

@@ -17,5 +17,6 @@ namespace PersonalFinanceManagement.Models.TransactionModels
         public Kind Kind { get; set; }
         [Ignore]
         public string? CatCode { get; set; }
+        public string? SplitId { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using PersonalFinanceManagement.Database.Entities;
 using PersonalFinanceManagement.Database.Repositories.CategoryRepositories;
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.CategoryModels;
+using PersonalFinanceManagement.Models.TransactionModels;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -29,6 +30,11 @@ namespace PersonalFinanceManagement.Services.CategoryServices
         {
             var categories = await _categoryRepository.GetCategoriesAsync(parentCategory);
             return categories.Select(c => _mapper.Map<Category>(c)).ToList();
+        }
+
+        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        {
+            return await _categoryRepository.GetSpendingAnalyticsAsync(catcode, startDate, endDate, direction);
         }
 
         public async Task<string> ImportCategoriesAsync(IFormFile file)

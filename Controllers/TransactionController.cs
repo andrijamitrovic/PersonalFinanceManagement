@@ -50,9 +50,16 @@ namespace PersonalFinanceManagement.Controllers
         }
 
         [HttpPost("{id}/categorize")]
-        public async Task<IActionResult> CategorizeTransactionAsync([FromRoute] string id, [FromBody] string catCode)
+        public async Task<IActionResult> CategorizeTransactionAsync([FromRoute] string id, [FromBody] string catcode)
         {
-            await _transactionsService.CategorizeTransactionAsync(id, catCode);
+            await _transactionsService.CategorizeTransactionAsync(id, catcode);
+            return Ok();
+        }
+
+        [HttpPost("{id}/split")]
+        public async Task<IActionResult> SplitTransactionAsync([FromRoute] string id, [FromBody] SplitsRequest splits)
+        {
+            await _transactionsService.SplitTransactionAsync(id, splits.Splits);
             return Ok();
         }
     }

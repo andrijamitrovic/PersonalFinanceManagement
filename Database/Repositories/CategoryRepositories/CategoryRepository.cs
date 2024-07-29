@@ -3,6 +3,9 @@ using PersonalFinanceManagement.Database.Entities;
 using PersonalFinanceManagement.Models.TransactionModels;
 using PersonalFinanceManagement.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using System.Globalization;
 
 namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
 {
@@ -49,6 +52,41 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        {
+
+            var query = _dbContext.Transactions.AsQueryable();
+            query = query.Where(t => !string.IsNullOrWhiteSpace(t.CatCode));
+            if (!string.IsNullOrEmpty(catcode))
+            {
+                query = query.Where(t => t.CatCode == catcode);
+            }
+            if (startDate != null)
+            {
+                query = query.Where(x => x.Date > startDate);
+            }
+            if (endDate != null)
+            {
+                query = query.Where(x => x.Date < endDate);
+            }
+            if (direction != null)
+            {
+                query = query.Where(x => x.Direction == direction);
+            }
+
+            var groups = (await query.ToListAsync())
+                                   .GroupBy(t => t.CatCode)
+                                   .Select(g => new SpendingAnalytics
+                                   {
+                                        CatCode = g.Key,
+                                        Amount = g.Sum(t => t.Amount),
+                                        Count = g.Count()
+                                   })
+                                   .ToList();
+
+            return groups;
         }
     }
 }

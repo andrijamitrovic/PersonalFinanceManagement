@@ -14,6 +14,9 @@ namespace PersonalFinanceManagement.Database.Entities
         public int? Mcc { get; set; }
         public Kind Kind { get; set; }
         public string? CatCode { get; set; }
+        public string? SplitId { get; set; }
         public CategoryEntity Category { get; set; }
+        public TransactionEntity SplitBy { get; set; }
+        public ICollection<TransactionEntity>? Splits { get; set; }
     }
 }

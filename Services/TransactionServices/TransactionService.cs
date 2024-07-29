@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.CsvHelper;
 using PersonalFinanceManagement.Database.Entities;
 using PersonalFinanceManagement.Database.Repositories.TransactionRepositories;
@@ -25,9 +26,9 @@ namespace PersonalFinanceManagement.Services.TransactionServices
             _logger = logger;
         }
 
-        public async Task<string> CategorizeTransactionAsync(string id, string catCode)
+        public async Task<string> CategorizeTransactionAsync(string id, string catcode)
         {
-            return await _transactionRepository.CategorizeTransactionAsync(id, catCode);
+            return await _transactionRepository.CategorizeTransactionAsync(id, catcode);
         }
 
         public async Task<PagedSortedFilteredList<Transaction>> GetTransactionsAsync(List<Kind>? transactionKind, DateTime? startDate, DateTime? endDate, int page, int pageSize, SortOrder sortOrder, string? sortBy)
@@ -63,6 +64,11 @@ namespace PersonalFinanceManagement.Services.TransactionServices
             badTransactions.AddRange(await _transactionRepository.ImportTransactionsAsync(uniqueTransactions.Select(i => _mapper.Map<TransactionEntity>(i))));
 
             return string.Join(Environment.NewLine, badTransactions);
+        }
+        public async Task SplitTransactionAsync(string id, List<Split> splits)
+        {
+            await _transactionRepository.SplitTransactionAsync(id, splits);
+
         }
     }
 }
