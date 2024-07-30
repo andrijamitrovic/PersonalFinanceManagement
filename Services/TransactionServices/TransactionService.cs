@@ -60,12 +60,12 @@ namespace PersonalFinanceManagement.Services.TransactionServices
             }
             badTransactions.AddRange(duplicateTransactions.Select(t => $"[id repeated in the file][{t.Id},{t.BeneficiaryName}," +
                                                                        $"{t.Date},{t.Direction},{t.Amount},{t.Description},{t.Currency}," +
-                                                                       $"{t.Mcc},{t.Kind},{t.CatCode}]"));
+                                                                       $"{t.Mcc},{t.Kind},{t.Catcode}]"));
             badTransactions.AddRange(await _transactionRepository.ImportTransactionsAsync(uniqueTransactions.Select(i => _mapper.Map<TransactionEntity>(i))));
 
             return string.Join(Environment.NewLine, badTransactions);
         }
-        public async Task SplitTransactionAsync(string id, List<Split> splits)
+        public async Task SplitTransactionAsync(string id, SplitTransactionCommand splits)
         {
             await _transactionRepository.SplitTransactionAsync(id, splits);
 

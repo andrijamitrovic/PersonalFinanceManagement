@@ -38,15 +38,6 @@ namespace PersonalFinanceManagement.Controllers
         [Route("import")]
         public async Task<IActionResult> ImportCategoriesAsync(IFormFile file)
         {
-            List<RequestError> errors = new List<RequestError>();
-            var ext = file.FileName.Split(".");
-
-            if (ext.Length < 2 || ext.Last() != "csv")
-            {
-                errors.Add(_requestErrorService.GetFileNameError());
-                return BadRequest(errors);
-            }
-
             var badTransactions = await _categoryService.ImportCategoriesAsync(file);
 
             return File(Encoding.UTF8.GetBytes(badTransactions), "text/plain", "badCategories.txt");

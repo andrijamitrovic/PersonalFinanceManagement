@@ -12,12 +12,10 @@ namespace PersonalFinanceManagement.Models.TransactionModels
         public double Amount { get; set; }
         public string? Description { get; set; }
         public string Currency { get; set; }
-        public int? Mcc { get; set; }
+        public Mcc? Mcc { get; set; }
         [EnumIgnoreCase]
         public Kind Kind { get; set; }
         [Ignore]
-        public string? CatCode { get; set; }
-        [Ignore]
-        public string? SplitId { get; set; }
+        public string? Catcode { get; set; }
     }
 }

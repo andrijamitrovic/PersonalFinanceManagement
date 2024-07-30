@@ -20,6 +20,13 @@ namespace PersonalFinanceManagement.CsvHelper
             List<string> badRecords = new List<string>();
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
+                HeaderValidated = x =>
+                {
+                    if (x.InvalidHeaders.Length > 0)
+                        foreach (var invalidHeader in x.InvalidHeaders)
+                            foreach(var header in invalidHeader.Names)
+                                badRecords.Add($"[header is missing][{header}]");
+                },
                 PrepareHeaderForMatch = args => args.Header.Replace("-", "").ToLower(),
                 ReadingExceptionOccurred = args =>
                 {

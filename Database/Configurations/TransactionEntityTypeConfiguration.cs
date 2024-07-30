@@ -23,13 +23,16 @@ namespace PersonalFinanceManagement.Database.Configurations
             builder.Property(x => x.Amount).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(1024);
             builder.Property(x => x.Currency).HasMaxLength(3).IsFixedLength(true).IsRequired();
-            builder.Property(x => x.Mcc);
+            builder.Property(x => x.Mcc).HasConversion<string>();
             builder.Property(x => x.Kind).HasConversion<string>().IsRequired();
             builder.Property(x => x.CatCode).HasMaxLength(64);
             //definition of foreign keys
-            builder.HasOne(c => c.SplitBy)
-                   .WithMany(c => c.Splits)
-                   .HasForeignKey(c => c.SplitId);
+            builder.HasMany(t => t.TransactionSplits)
+                   .WithOne(t => t.Transaction)
+                   .HasForeignKey(t => t.TransactionId);
+            builder.HasOne(t => t.Category)
+                   .WithMany(c => c.Transactions)
+                   .HasForeignKey(t => t.CatCode);
         }
     }
 }

@@ -11,6 +11,6 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
 
         Task<List<string>> ImportTransactionsAsync(IEnumerable<TransactionEntity> transaction);
         Task<string> CategorizeTransactionAsync(string id, string catcode);
-        Task SplitTransactionAsync(string id, List<Split> splits);
+        Task SplitTransactionAsync(string id, SplitTransactionCommand splits);
     }
 }

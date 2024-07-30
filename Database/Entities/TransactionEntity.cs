@@ -11,12 +11,10 @@ namespace PersonalFinanceManagement.Database.Entities
         public double Amount { get; set; }
         public string? Description { get; set; }
         public string Currency { get; set; }
-        public int? Mcc { get; set; }
+        public Mcc? Mcc { get; set; }
         public Kind Kind { get; set; }
         public string? CatCode { get; set; }
-        public string? SplitId { get; set; }
         public CategoryEntity Category { get; set; }
-        public TransactionEntity SplitBy { get; set; }
-        public ICollection<TransactionEntity>? Splits { get; set; }
+        public ICollection<TransactionSplitEntity>? TransactionSplits { get; set; }
     }
 }

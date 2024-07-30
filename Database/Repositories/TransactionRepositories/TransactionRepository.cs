@@ -107,7 +107,7 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             return "123";
         }
 
-        public async Task SplitTransactionAsync(string id, List<Split> splits)
+        public async Task SplitTransactionAsync(string id, SplitTransactionCommand splits)
         {
             var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id.Equals(id));
             
@@ -116,35 +116,30 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
                 return;
             }
 
-            if(transaction.Splits != null && transaction.Splits.Count > 0)
+            var oldTransactionSplits = _dbContext.TransactionSplits.Where(t => t.TransactionId == transaction.Id).ToList();
+
+            if (oldTransactionSplits.Count() > 0)
             {
-                foreach (var split in transaction.Splits)
+                foreach (var split in oldTransactionSplits)
                 {
-                    _dbContext.Transactions.Remove(split);
+                    _dbContext.TransactionSplits.Remove(split);
                 }
             }
 
-            List<TransactionEntity> newTransactions = new List<TransactionEntity>();
-            foreach (Split split in splits)
+            List<TransactionSplitEntity> newTransactionSplits = new List<TransactionSplitEntity>();
+            foreach (var split in splits.Splits)
             {
-                var newTransaction = new TransactionEntity
+                var newTransactionSplit = new TransactionSplitEntity
                 {
                     Id = Guid.NewGuid().ToString(),
-                    BeneficiaryName = transaction.BeneficiaryName,
-                    Date = transaction.Date,
-                    Direction = transaction.Direction,
-                    Description = transaction.Description,
-                    Currency = transaction.Currency,
-                    Mcc = transaction.Mcc,
-                    Kind = transaction.Kind,
-                    SplitId = transaction.Id,
                     Amount = split.Amount,
-                    CatCode = split.Catcode
+                    CatCode = split.Catcode,
+                    TransactionId = transaction.Id
                 };
-                newTransactions.Add(newTransaction);
+                newTransactionSplits.Add(newTransactionSplit);
             }
 
-            await _dbContext.AddRangeAsync(newTransactions);
+            await _dbContext.AddRangeAsync(newTransactionSplits);
             await _dbContext.SaveChangesAsync();
 
         }

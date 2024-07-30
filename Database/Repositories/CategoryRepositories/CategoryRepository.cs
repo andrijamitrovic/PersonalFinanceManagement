@@ -61,7 +61,9 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
             query = query.Where(t => !string.IsNullOrWhiteSpace(t.CatCode));
             if (!string.IsNullOrEmpty(catcode))
             {
-                query = query.Where(t => t.CatCode == catcode);
+                var listOfCatCodes = new List<string> { catcode };
+                listOfCatCodes.AddRange(await GetAllCategoriesByCatCode(catcode));
+                query = query.Where(t => listOfCatCodes.Contains(t.CatCode));
             }
             if (startDate != null)
             {
@@ -80,13 +82,25 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
                                    .GroupBy(t => t.CatCode)
                                    .Select(g => new SpendingAnalytics
                                    {
-                                        CatCode = g.Key,
+                                        Catcode = g.Key,
                                         Amount = g.Sum(t => t.Amount),
                                         Count = g.Count()
                                    })
                                    .ToList();
 
             return groups;
+        }
+
+        private async Task<List<string>> GetAllCategoriesByCatCode(string catcode)
+        {
+            var listOfChildren = new List<string>();
+            var children = await _dbContext.Categories.Where(c => c.ParentCode == catcode).ToListAsync();
+            foreach (var child in children)
+            {
+                listOfChildren.Add(child.Code);
+                listOfChildren.AddRange(await GetAllCategoriesByCatCode(child.Code));
+            }
+            return listOfChildren;
         }
     }
 }

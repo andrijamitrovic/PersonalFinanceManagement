@@ -82,19 +82,40 @@ namespace PersonalFinanceManagement.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Mcc")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SplitId")
-                        .HasColumnType("character varying(64)");
+                    b.Property<string>("Mcc")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CatCode");
 
-                    b.HasIndex("SplitId");
-
                     b.ToTable("transactions", (string)null);
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("CatCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("transactions_splits", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
@@ -112,13 +133,18 @@ namespace PersonalFinanceManagement.Migrations
                         .WithMany("Transactions")
                         .HasForeignKey("CatCode");
 
-                    b.HasOne("PersonalFinanceManagement.Database.Entities.TransactionEntity", "SplitBy")
-                        .WithMany("Splits")
-                        .HasForeignKey("SplitId");
-
                     b.Navigation("Category");
+                });
 
-                    b.Navigation("SplitBy");
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Database.Entities.TransactionEntity", "Transaction")
+                        .WithMany("TransactionSplits")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
@@ -130,7 +156,7 @@ namespace PersonalFinanceManagement.Migrations
 
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionEntity", b =>
                 {
-                    b.Navigation("Splits");
+                    b.Navigation("TransactionSplits");
                 });
 #pragma warning restore 612, 618
         }
