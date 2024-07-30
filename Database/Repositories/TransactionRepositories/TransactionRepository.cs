@@ -81,7 +81,7 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             }
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            var products = await query.ToListAsync();
+            var products = await query.Include(x => x.TransactionSplits).ToListAsync();
 
             return new PagedSortedFilteredList<TransactionEntity>
             {

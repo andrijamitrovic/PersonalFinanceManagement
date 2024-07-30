@@ -56,15 +56,33 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
 
         public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
         {
+            var analytics = new List<SpendingAnalytics>();
 
-            var query = _dbContext.Transactions.AsQueryable();
-            query = query.Where(t => !string.IsNullOrWhiteSpace(t.CatCode));
             if (!string.IsNullOrEmpty(catcode))
             {
-                var listOfCatCodes = new List<string> { catcode };
-                listOfCatCodes.AddRange(await GetAllCategoriesByCatCode(catcode));
-                query = query.Where(t => listOfCatCodes.Contains(t.CatCode));
+                analytics.Add(await GetSpendingAnalyticsForACategoryAsync(catcode, startDate, endDate, direction));
             }
+            else
+            {
+                var allCategories = _dbContext.Categories.Where(c => string.IsNullOrEmpty(c.ParentCode)).ToList();
+                foreach(var category in allCategories)
+                {
+                    analytics.Add(await GetSpendingAnalyticsForACategoryAsync(category.Code, startDate, endDate, direction));
+                }
+            }
+
+            return analytics;
+        }
+
+        private async Task<SpendingAnalytics> GetSpendingAnalyticsForACategoryAsync(string catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        {
+            var listOfCatCodes = new List<string> { catcode };
+            listOfCatCodes.AddRange(await GetAllCategoriesByCatCode(catcode));
+
+            var query = _dbContext.Transactions.AsQueryable();
+            query = query.Include(t => t.TransactionSplits);
+            query = query.Where(t => !string.IsNullOrWhiteSpace(t.CatCode));
+            query = query.Where(t => listOfCatCodes.Contains(t.CatCode) || t.TransactionSplits != null && t.TransactionSplits.Where(ts => (listOfCatCodes.Contains(ts.CatCode))).ToList().Count != 0);
             if (startDate != null)
             {
                 query = query.Where(x => x.Date > startDate);
@@ -78,17 +96,58 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
                 query = query.Where(x => x.Direction == direction);
             }
 
-            var groups = (await query.ToListAsync())
-                                   .GroupBy(t => t.CatCode)
-                                   .Select(g => new SpendingAnalytics
-                                   {
-                                        Catcode = g.Key,
-                                        Amount = g.Sum(t => t.Amount),
-                                        Count = g.Count()
-                                   })
-                                   .ToList();
 
-            return groups;
+
+            var transactions = await query.ToListAsync();
+            int count = 0;
+            double amount = 0;
+            foreach(var transaction in transactions)
+            {
+                if(listOfCatCodes.Contains(transaction.CatCode))
+                {
+                    double splitAmount = 0;
+                    int splitCount = 0;
+                    if (transaction.TransactionSplits != null)
+                    {
+                        foreach (var transactionSplit in transaction.TransactionSplits)
+                        {
+                            if (listOfCatCodes.Contains(transactionSplit.CatCode))
+                            {
+                                splitAmount += transactionSplit.Amount;
+                                splitCount++;
+                            }
+                        }
+                    }
+                    if (splitAmount == 0 && splitCount == 0)
+                    {
+                        amount += transaction.Amount;
+                        count++;
+                    }
+                    else
+                    {
+                        amount += splitAmount;
+                        count += splitCount;
+                    }
+
+                }
+                else if(transaction.TransactionSplits != null)
+                {
+                    foreach (var transactionSplit in transaction.TransactionSplits)
+                    {
+                        if (listOfCatCodes.Contains(transactionSplit.CatCode))
+                        {
+                            amount += transactionSplit.Amount;
+                            count++;
+                        }
+                    }
+                }
+            }
+            return new SpendingAnalytics
+            {
+                Catcode = catcode,
+                Amount = amount,
+                Count = count
+            };
         }
 
         private async Task<List<string>> GetAllCategoriesByCatCode(string catcode)
