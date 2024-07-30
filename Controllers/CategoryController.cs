@@ -4,6 +4,7 @@ using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Services.ErrorServices;
 using System.Text;
 using PersonalFinanceManagement.Services.CategoryServices;
+using PersonalFinanceManagement.Models.CategoryModels;
 
 namespace PersonalFinanceManagement.Controllers
 {
@@ -28,9 +29,9 @@ namespace PersonalFinanceManagement.Controllers
         public async Task<IActionResult> GetCategoriesAsync([FromQuery] string? parentId = null)
         {
             var categories = await _categoryService.GetCategoriesAsync(parentId);
-            return Ok(new
+            return Ok(new CategoryList
             {
-                items = categories
+                Items = categories
             });
         }
 

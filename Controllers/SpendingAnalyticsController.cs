@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
 using PersonalFinanceManagement.Services.CategoryServices;
 using PersonalFinanceManagement.Services.ErrorServices;
@@ -26,9 +27,9 @@ namespace PersonalFinanceManagement.Controllers
         public async Task<IActionResult> GetSpendingAnalyticsAsync([FromQuery] string? catcode, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] Direction? direction)
         {
             var groups = await _categoryService.GetSpendingAnalyticsAsync(catcode, startDate, endDate, direction);
-            return Ok(new
+            return Ok(new SpendingByCategory
             {
-                groups = groups
+                Groups = groups
             });
         }
     }

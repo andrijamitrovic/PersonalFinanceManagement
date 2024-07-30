@@ -26,7 +26,7 @@ namespace PersonalFinanceManagement.Services.TransactionServices
             _logger = logger;
         }
 
-        public async Task<string> CategorizeTransactionAsync(string id, string catcode)
+        public async Task<BussinessProblem?> CategorizeTransactionAsync(string id, string catcode)
         {
             return await _transactionRepository.CategorizeTransactionAsync(id, catcode);
         }
@@ -65,10 +65,9 @@ namespace PersonalFinanceManagement.Services.TransactionServices
 
             return string.Join(Environment.NewLine, badTransactions);
         }
-        public async Task SplitTransactionAsync(string id, SplitTransactionCommand splits)
+        public async Task<BussinessProblem?> SplitTransactionAsync(string id, SplitTransactionCommand splits)
         {
-            await _transactionRepository.SplitTransactionAsync(id, splits);
-
+            return await _transactionRepository.SplitTransactionAsync(id, splits);
         }
     }
 }

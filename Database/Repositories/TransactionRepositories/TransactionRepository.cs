@@ -95,25 +95,71 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             };
         }
 
-        public async Task<string> CategorizeTransactionAsync(string id, string catcode)
+        public async Task<BussinessProblem?> CategorizeTransactionAsync(string id, string catcode)
         {
             var transactionToUpdate = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id == id);
             var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Code == catcode);
-            if (transactionToUpdate != null && category != null)
+            if (transactionToUpdate != null)
             {
-                transactionToUpdate.CatCode = catcode;
-                await _dbContext.SaveChangesAsync();
+                if (category != null)
+                {
+                    transactionToUpdate.CatCode = catcode;
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    return new BussinessProblem
+                    {
+                        Problem = "category-doesnt-exist",
+                        Message = "Category doesn't exist",
+                        Details = "The category with this category code doesn't exist."
+                    };
+                }
             }
-            return "123";
+            else
+            {
+                return new BussinessProblem
+                {
+                    Problem = "transaction-doesnt-exist",
+                    Message = "Transaction doesn't exist",
+                    Details = "The transaction with this id doesn't exist."
+                };
+            }
+            return null;
         }
 
-        public async Task SplitTransactionAsync(string id, SplitTransactionCommand splits)
+        public async Task<BussinessProblem?> SplitTransactionAsync(string id, SplitTransactionCommand splits)
         {
             var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.Id.Equals(id));
             
             if(transaction == null)
             {
-                return;
+                return new BussinessProblem
+                {
+                    Problem = "transaction-doesnt-exist",
+                    Message = "Transaction doesn't exist",
+                    Details = "The transaction with this id doesn't exist."
+                };
+            }
+
+            var totalAmount = splits.Splits.Sum(s => s.Amount);
+            if (totalAmount > transaction.Amount)
+            {
+                return new BussinessProblem
+                {
+                    Problem = "split-amount-over-transaction-amount",
+                    Message = "Split amount is over the transaction amount",
+                    Details = "The sum of amounts of all splits is larger than the transaction amount."
+                };
+            }
+            if (totalAmount < transaction.Amount)
+            {
+                return new BussinessProblem
+                {
+                    Problem = "split-amount-under-transaction-amount",
+                    Message = "Split amount is under the transaction amount",
+                    Details = "The sum of amounts of all splits is smaller than the transaction amount."
+                };
             }
 
             var oldTransactionSplits = _dbContext.TransactionSplits.Where(t => t.TransactionId == transaction.Id).ToList();
@@ -142,6 +188,7 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             await _dbContext.AddRangeAsync(newTransactionSplits);
             await _dbContext.SaveChangesAsync();
 
+            return null;
         }
     }
 }

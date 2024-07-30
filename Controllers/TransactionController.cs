@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
 using PersonalFinanceManagement.Services.ErrorServices;
 using PersonalFinanceManagement.Services.TransactionServices;
+using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Controllers
 {
@@ -35,15 +41,6 @@ namespace PersonalFinanceManagement.Controllers
         [Route("import")]
         public async Task<IActionResult> ImportTransactionsAsync(IFormFile file)
         {
-            List<RequestError> errors = new List<RequestError>();
-            var ext = file.FileName.Split(".");
-
-            if (ext.Length < 2 || ext.Last() != "csv")
-            {
-                errors.Add(_requestErrorService.GetFileNameError());
-                return BadRequest(errors);
-            }
-
             var badTransactions = await _transactionsService.ImportTransactionsAsync(file);
 
             return File(Encoding.UTF8.GetBytes(badTransactions), "text/plain", "badTransactions.txt");
@@ -52,15 +49,29 @@ namespace PersonalFinanceManagement.Controllers
         [HttpPost("{id}/categorize")]
         public async Task<IActionResult> CategorizeTransactionAsync([FromRoute] string id, [FromBody] TransactionCategorizeCommand catcode)
         {
-            await _transactionsService.CategorizeTransactionAsync(id, catcode.Catcode);
-            return Ok();
+            var response = await _transactionsService.CategorizeTransactionAsync(id, catcode.Catcode);
+            if(response == null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(440, response);
+            }
         }
 
         [HttpPost("{id}/split")]
         public async Task<IActionResult> SplitTransactionAsync([FromRoute] string id, [FromBody] SplitTransactionCommand splits)
         {
-            await _transactionsService.SplitTransactionAsync(id, splits);
-            return Ok();
+            var response = await _transactionsService.SplitTransactionAsync(id, splits);
+            if (response == null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(440, response);
+            }
         }
     }
 }
