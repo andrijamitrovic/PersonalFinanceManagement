@@ -82,8 +82,8 @@ namespace PersonalFinanceManagement.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Mcc")
-                        .HasColumnType("text");
+                    b.Property<int?>("Mcc")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

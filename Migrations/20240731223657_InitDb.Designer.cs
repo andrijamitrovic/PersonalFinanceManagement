@@ -12,8 +12,8 @@ using PersonalFinanceManagement.Database;
 namespace PersonalFinanceManagement.Migrations
 {
     [DbContext(typeof(PFMDbContext))]
-    [Migration("20240727152859_AddCategories")]
-    partial class AddCategories
+    [Migration("20240731223657_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,8 +70,8 @@ namespace PersonalFinanceManagement.Migrations
                         .HasColumnType("character(3)")
                         .IsFixedLength();
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -95,6 +95,32 @@ namespace PersonalFinanceManagement.Migrations
                     b.ToTable("transactions", (string)null);
                 });
 
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("CatCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("transactions_splits", (string)null);
+                });
+
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
                 {
                     b.HasOne("PersonalFinanceManagement.Database.Entities.CategoryEntity", "ParentCategory")
@@ -113,11 +139,27 @@ namespace PersonalFinanceManagement.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Database.Entities.TransactionEntity", "Transaction")
+                        .WithMany("TransactionSplits")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.CategoryEntity", b =>
                 {
                     b.Navigation("ChildCategories");
 
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Database.Entities.TransactionEntity", b =>
+                {
+                    b.Navigation("TransactionSplits");
                 });
 #pragma warning restore 612, 618
         }
