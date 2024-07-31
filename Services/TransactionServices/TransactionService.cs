@@ -8,6 +8,7 @@ using PersonalFinanceManagement.Database.Repositories.TransactionRepositories;
 using PersonalFinanceManagement.Models;
 using PersonalFinanceManagement.Models.TransactionModels;
 using System.Globalization;
+using System.Text.Json;
 
 namespace PersonalFinanceManagement.Services.TransactionServices
 {
@@ -31,7 +32,7 @@ namespace PersonalFinanceManagement.Services.TransactionServices
             return await _transactionRepository.CategorizeTransactionAsync(id, catcode);
         }
 
-        public async Task<PagedSortedFilteredList<Transaction>> GetTransactionsAsync(List<Kind>? transactionKind, DateTime? startDate, DateTime? endDate, int page, int pageSize, SortOrder sortOrder, string? sortBy)
+        public async Task<PagedSortedFilteredList<Transaction>> GetTransactionsAsync(List<Kind>? transactionKind, DateOnly? startDate, DateOnly? endDate, int page, int pageSize, SortOrder sortOrder, string? sortBy)
         {
             var transactions = await _transactionRepository.GetTransactionsAsync(transactionKind, startDate, endDate, page, pageSize, sortOrder, sortBy);
             return _mapper.Map<PagedSortedFilteredList<Transaction>>(transactions);
@@ -68,6 +69,18 @@ namespace PersonalFinanceManagement.Services.TransactionServices
         public async Task<BussinessProblem?> SplitTransactionAsync(string id, SplitTransactionCommand splits)
         {
             return await _transactionRepository.SplitTransactionAsync(id, splits);
+        }
+
+        public async Task AutoCategorizeTransactionAsync()
+        {
+            var jsonFilePath = "./AutoCategorizeRules/rules.json";
+            using (var stream = new FileStream(jsonFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var rules = await JsonSerializer.DeserializeAsync<AutoCategorizeRuleList<Rule>>(stream);
+                await _transactionRepository.AutoCategorizeTransactionAsync(rules);
+            }
+
+            return; 
         }
     }
 }

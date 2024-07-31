@@ -31,9 +31,29 @@ namespace PersonalFinanceManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTransactionsAsync([FromQuery] List<Kind>? transactionKind, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] SortOrder sortOrder = SortOrder.Asc, [FromQuery] string? sortBy = null)
+        public async Task<IActionResult> GetTransactionsAsync([FromQuery(Name = "transaction-kind")] string? transactionKind, [FromQuery(Name = "start-date")] string? startDate, [FromQuery(Name = "end-date")] string? endDate, [FromQuery] int page = 1, [FromQuery(Name = "page-size")] int pageSize = 10, [FromQuery(Name = "sort-order")] SortOrder sortOrder = SortOrder.Asc, [FromQuery(Name = "sort-by")] string? sortBy = null)
         {
-            var transactions = await _transactionsService.GetTransactionsAsync(transactionKind, startDate, endDate, page, pageSize, sortOrder, sortBy);
+            List<Kind>? _transactionKind = null;
+            if (transactionKind != null)
+            {
+                _transactionKind = new List<Kind>();
+                foreach (var kind in transactionKind.Split(','))
+                {
+                    _transactionKind.Add(Enum.Parse<Kind>(kind, ignoreCase: true));
+                }
+            }
+            DateOnly? _startDate = null;
+            if (startDate != null)
+            {
+                _startDate = DateOnly.ParseExact(startDate, "M/d/yyyy");
+            }
+            DateOnly? _endDate = null;
+            if (endDate != null)
+            {
+                _endDate = DateOnly.ParseExact(endDate, "M/d/yyyy");
+            }
+
+            var transactions = await _transactionsService.GetTransactionsAsync(_transactionKind, _startDate, _endDate, page, pageSize, sortOrder, sortBy);
             return Ok(transactions);
         }
 
@@ -72,6 +92,13 @@ namespace PersonalFinanceManagement.Controllers
             {
                 return StatusCode(440, response);
             }
+        }
+
+        [HttpPost("auto-categorize")]
+        public async Task<IActionResult> AutoCategorizeTransactionAsync()
+        {
+            await _transactionsService.AutoCategorizeTransactionAsync();
+            return Ok();
         }
     }
 }

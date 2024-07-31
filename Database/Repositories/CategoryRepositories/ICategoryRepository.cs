@@ -7,6 +7,6 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
     {
         Task<List<string>> ImportCategoriesAsync(IEnumerable<CategoryEntity> categories);
         public Task<List<CategoryEntity>> GetCategoriesAsync(string? parentCode);
-        Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction);
+        Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateOnly? startDate, DateOnly? endDate, Direction? direction);
     }
 }

@@ -1,0 +1,870 @@
+{
+	"info": {
+		"_postman_id": "d29ef0a6-287e-4f80-91a4-af1e49f3634c",
+		"name": "Personal Finance Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16737454"
+	},
+	"item": [
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Import",
+					"item": [
+						{
+							"name": "Validate Success",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/andri/Desktop/praksa/pfm-main/transactions.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{import}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{import}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Missing File",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{import}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{import}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get",
+					"item": [
+						{
+							"name": "Validate Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var schema = {\r",
+											"    \"$schema\": \"http://json-schema.org/draft-07/schema\",\r",
+											"    \"type\": \"object\",\r",
+											"    \"description\": \"Transaction get response\",\r",
+											"    \"default\": {},\r",
+											"    \"x-example\": {\r",
+											"        \"page-size\": 20,\r",
+											"        \"page\": 1,\r",
+											"        \"total-count\": 100,\r",
+											"        \"sort-by\": \"date,catcode\",\r",
+											"        \"sort-order\": \"date,asc\",\r",
+											"        \"items\": [\r",
+											"            {\r",
+											"                \"id\": 66229487,\r",
+											"                \"beneficiary-name\": \"Faculty of contemporary arts\",\r",
+											"                \"date\": \"01/01/2021\",\r",
+											"                \"direction\": \"d\",\r",
+											"                \"amount\": 187.20,\r",
+											"                \"description\": \"Tuition\",\r",
+											"                \"currency\": \"USD\",\r",
+											"                \"mcc\": 8299,\r",
+											"                \"kind\": \"pmt\",\r",
+											"                \"splits\": [\r",
+											"                    {\r",
+											"                        \"catcode\": \"A\",\r",
+											"                        \"amount\": 17.2\r",
+											"                    }\r",
+											"                ]\r",
+											"            },\r",
+											"            {\r",
+											"                \"id\": 15122088,\r",
+											"                \"beneficiary-name\": \"Glovo\",\r",
+											"                \"date\": \"01/01/2021\",\r",
+											"                \"direction\": \"d\",\r",
+											"                \"amount\": 44.30,\r",
+											"                \"description\": \"Food delivery\",\r",
+											"                \"currency\": \"USD\",\r",
+											"                \"mcc\": 5811,\r",
+											"                \"kind\": \"pmt\",\r",
+											"                \"splits\": [\r",
+											"                    {\r",
+											"                        \"catcode\": \"B\",\r",
+											"                        \"amount\": 17\r",
+											"                    }\r",
+											"                ]\r",
+											"            }\r",
+											"        ]\r",
+											"    },\r",
+											"    \"properties\": {\r",
+											"        \"total-count\": {\r",
+											"            \"type\": [\"integer\", \"null\"],\r",
+											"            \"description\": \"Total count of transactions\"\r",
+											"        },\r",
+											"        \"page-size\": {\r",
+											"            \"type\": [\"integer\", \"null\"],\r",
+											"            \"description\": \"The size of a page\"\r",
+											"        },\r",
+											"        \"page\": {\r",
+											"            \"type\": [\"integer\", \"null\"],\r",
+											"            \"description\": \"Index of current page\"\r",
+											"        },\r",
+											"        \"total-pages\": {\r",
+											"            \"type\": [\"integer\", \"null\"],\r",
+											"            \"description\": \"Total number of pages of set size\"\r",
+											"        },\r",
+											"        \"sort-order\": {\r",
+											"            \"type\": [\"string\", \"null\"],\r",
+											"            \"description\": \"Ascending or descending sort order\",\r",
+											"            \"enum\": [\r",
+											"                \"asc\",\r",
+											"                \"desc\"\r",
+											"            ]\r",
+											"        },\r",
+											"        \"sort-by\": {\r",
+											"            \"type\": [\"string\", \"null\"],\r",
+											"            \"description\": \"Attribute of the collection item to sort by\"\r",
+											"        },\r",
+											"        \"items\": {\r",
+											"            \"type\": [\"array\", \"null\"],\r",
+											"            \"description\": \"Array of transactions\",\r",
+											"            \"item\": {\r",
+											"                \"type\": [\"object\", \"null\"],\r",
+											"                \"description\": \"Transactions\",\r",
+											"                \"properties\": {\r",
+											"                    \"id\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"ID of the transaction\"\r",
+											"                    },\r",
+											"                    \"beneficiary-name\": {\r",
+											"                        \"type\": [\"string\", \"null\"],\r",
+											"                        \"description\": \"Name of the beneficiary of the transaction\"\r",
+											"                    },\r",
+											"                    \"date\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Date the transaction took place\"\r",
+											"                    },\r",
+											"                    \"direction\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Debit (d) for liabilities or credit (c) for assets\",\r",
+											"                        \"enum\": [\r",
+											"                            \"d\",\r",
+											"                            \"c\"\r",
+											"                        ]\r",
+											"                    },\r",
+											"                    \"amount\": {\r",
+											"                        \"type\": \"number\",\r",
+											"                        \"description\": \"Transaction amount\"\r",
+											"                    },\r",
+											"                    \"description\": {\r",
+											"                        \"type\": [\"string\", \"null\"],\r",
+											"                        \"description\": \"Transaction description\"\r",
+											"                    },\r",
+											"                    \"currency\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Currency for transaction. ISO 4217 currency code\"\r",
+											"                    },\r",
+											"                    \"mcc\": {\r",
+											"                        \"type\": [\"string\", \"null\"],\r",
+											"                        \"description\": \"Enumeration mcc_code are standardized 4 digit numbers used by the payments industry where this code classifies a particular business by market segment\"\r",
+											"                    },\r",
+											"                    \"kind\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Enumeration that distinguishes between accounting transactions based on their effect on the customer accounts\",\r",
+											"                        \"enum\": [\r",
+											"                            \"dep\",\r",
+											"                            \"wdw\",\r",
+											"                            \"pmt\",\r",
+											"                            \"fee\",\r",
+											"                            \"inc\",\r",
+											"                            \"rev\",\r",
+											"                            \"adj\",\r",
+											"                            \"lnd\",\r",
+											"                            \"lnr\",\r",
+											"                            \"fcx\",\r",
+											"                            \"aop\",\r",
+											"                            \"acl\",\r",
+											"                            \"spl\",\r",
+											"                            \"sal\"\r",
+											"                        ]\r",
+											"                    },\r",
+											"                    \"catcode\": {\r",
+											"                        \"type\": [\"string\", \"null\"],\r",
+											"                        \"description\": \"Code of category. If literal it's category, If number it is a sub category code\"\r",
+											"                    },\r",
+											"                    \"splits\": {\r",
+											"                        \"type\": [\"array\", \"null\"],\r",
+											"                        \"description\": \"Array of transactions\",\r",
+											"                        \"split\": {\r",
+											"                            \"type\": [\"object\", \"null\"],\r",
+											"                            \"description\": \"Transaction splits\",\r",
+											"                            \"properties\": {\r",
+											"                                \"catcode\": {\r",
+											"                                    \"type\": \"string\",\r",
+											"                                    \"description\": \"Code of category or subcategory to split in\"\r",
+											"                                },\r",
+											"                                \"amount\": {\r",
+											"                                    \"type\": \"number\",\r",
+											"                                    \"description\": \"Amount to split to\"\r",
+											"                                }\r",
+											"                            }\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        }\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Split",
+					"item": [
+						{
+							"name": "Validate Body",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var schema = {\r",
+											"    \"$schema\": \"http://json-schema.org/draft-07/schema\",\r",
+											"    \"type\": \"object\",\r",
+											"    \"description\": \"Command to split transaction\",\r",
+											"    \"default\": {},\r",
+											"    \"x-example\": {\r",
+											"        \"splits\": [\r",
+											"            {\r",
+											"                \"catcode\": \"A\",\r",
+											"                \"amount\": 187.20\r",
+											"            },\r",
+											"            {\r",
+											"                \"catcode\": \"B\",\r",
+											"                \"amount\": 12.20\r",
+											"            }\r",
+											"        ]\r",
+											"    },\r",
+											"    \"properties\": {\r",
+											"        \"splits\": {\r",
+											"            \"type\": [\"array\", \"null\"],\r",
+											"            \"description\": \"Array of transactions\",\r",
+											"            \"split\": {\r",
+											"                \"type\": [\"object\", \"null\"],\r",
+											"                \"description\": \"Array of splits\",\r",
+											"                \"properties\": {\r",
+											"                    \"catcode\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Code of category or subcategory to split in\"\r",
+											"                    },\r",
+											"                    \"amount\": {\r",
+											"                        \"type\": \"number\",\r",
+											"                        \"description\": \"Amount to split to\"\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        }\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.request.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"splits\": [\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 17.2\r\n    },\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 1\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{id}}{{split}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{id}}{{split}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Transaction Smaller Than Sum Of Splits",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 440\", function () {\r",
+											"    pm.response.to.have.status(440);\r",
+											"});\r",
+											"pm.test(\"Message is correct\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.details).to.eql(\"The sum of amounts of all splits is larger than the transaction amount.\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"splits\": [\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 17.2\r\n    },\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 4\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{id}}{{split}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{id}}{{split}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Transaction Larger Than Sum Of Splits",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 440\", function () {\r",
+											"    pm.response.to.have.status(440);\r",
+											"});\r",
+											"pm.test(\"Message is correct\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.details).to.eql(\"The sum of amounts of all splits is smaller than the transaction amount.\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"splits\": [\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 1.2\r\n    },\r\n    {\r\n      \"catcode\": \"A\",\r\n      \"amount\": 4\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{id}}{{split}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{id}}{{split}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Auto Categorize",
+					"item": [
+						{
+							"name": "Validate Success",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{auto-categorize}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{auto-categorize}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Get",
+					"item": [
+						{
+							"name": "Validate Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var schema = {\r",
+											"    \"$schema\": \"http://json-schema.org/draft-07/schema\",\r",
+											"    \"type\": \"object\",\r",
+											"    \"description\": \"Category get response\",\r",
+											"    \"default\": {},\r",
+											"    \"x-example\": {\r",
+											"        \"items\": [\r",
+											"            {\r",
+											"            \"code\": \"A\",\r",
+											"                \"parent-code\": \"\",\r",
+											"            \"name\": \"Misc Expenses\"\r",
+											"            },\r",
+											"            {\r",
+											"            \"code\": 3,\r",
+											"            \"parent-code\": \"B\",\r",
+											"            \"name\": \"Auto Leasing\"\r",
+											"            }\r",
+											"        ]\r",
+											"    },\r",
+											"    \"properties\": {\r",
+											"        \"items\": {\r",
+											"            \"type\": [\"array\", \"null\"],\r",
+											"            \"description\": \"Array of categories\",\r",
+											"            \"item\": {\r",
+											"                \"type\": [\"object\", \"null\"],\r",
+											"                \"description\": \"Transactions\",\r",
+											"                \"properties\": {\r",
+											"                    \"code\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Code of category\"\r",
+											"                    },\r",
+											"                    \"name\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Name of the category\"\r",
+											"                    },\r",
+											"                    \"parent-code\": {\r",
+											"                        \"type\": [\"string\", \"null\"],\r",
+											"                        \"description\": \"Parent code if subcategory\"\r",
+											"                    },\r",
+											"                }\r",
+											"            }\r",
+											"        }\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{categories}}?parent-id=A",
+									"host": [
+										"{{baseUrl}}{{categories}}"
+									],
+									"query": [
+										{
+											"key": "parent-id",
+											"value": "A"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Import",
+					"item": [
+						{
+							"name": "Validate Success",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/andri/Desktop/praksa/pfm-main/transactions.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{transactions}}{{import}}",
+									"host": [
+										"{{baseUrl}}{{transactions}}{{import}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Missing File",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{categories}}{{import}}",
+									"host": [
+										"{{baseUrl}}{{categories}}{{import}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Spending Analytics",
+					"item": [
+						{
+							"name": "Validate Response Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var schema = {\r",
+											"    \"$schema\": \"http://json-schema.org/draft-07/schema\",\r",
+											"    \"type\": \"object\",\r",
+											"    \"description\": \"Spending analytics get response\",\r",
+											"    \"default\": {},\r",
+											"    \"x-example\": {\r",
+											"        \"groups\": [\r",
+											"        {\r",
+											"            \"catcode\": \"A\",\r",
+											"            \"amount\": 32,\r",
+											"            \"count\": 2\r",
+											"        },\r",
+											"        {\r",
+											"            \"catcode\": \"B\",\r",
+											"            \"amount\": 155,\r",
+											"            \"count\": 2\r",
+											"        },\r",
+											"        {\r",
+											"            \"catcode\": \"D\",\r",
+											"            \"amount\": 100,\r",
+											"            \"count\": 2\r",
+											"        },\r",
+											"        {\r",
+											"            \"catcode\": \"P\",\r",
+											"            \"amount\": 200,\r",
+											"            \"count\": 1\r",
+											"        }\r",
+											"        ]\r",
+											"    },\r",
+											"    \"properties\": {\r",
+											"        \"groups\": {\r",
+											"            \"type\": [\"array\", \"null\"],\r",
+											"            \"description\": \"Array of categories\",\r",
+											"            \"group\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"description\": \"Groups by categories\",\r",
+											"                \"properties\": {\r",
+											"                    \"catcode\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"description\": \"Code of category\"\r",
+											"                    },\r",
+											"                    \"amount\": {\r",
+											"                        \"type\": \"number\",\r",
+											"                        \"description\": \"Amount spent in category\"\r",
+											"                    },\r",
+											"                    \"count\": {\r",
+											"                        \"type\": \"number\",\r",
+											"                        \"description\": \"Number of transactions included in group\"\r",
+											"                    },\r",
+											"                }\r",
+											"            }\r",
+											"        }\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{spending-analytics}}",
+									"host": [
+										"{{baseUrl}}{{spending-analytics}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5162",
+			"type": "string"
+		},
+		{
+			"key": "transactions",
+			"value": "/transactions",
+			"type": "string"
+		},
+		{
+			"key": "import",
+			"value": "/import",
+			"type": "string"
+		},
+		{
+			"key": "split",
+			"value": "/split",
+			"type": "string"
+		},
+		{
+			"key": "id",
+			"value": "/{10023191}",
+			"type": "string"
+		},
+		{
+			"key": "auto-categorize",
+			"value": "/auto-categorize",
+			"type": "string"
+		},
+		{
+			"key": "categories",
+			"value": "/categories",
+			"type": "string"
+		},
+		{
+			"key": "spending-analytics",
+			"value": "/spending-analytics",
+			"type": "string"
+		}
+	]
+}

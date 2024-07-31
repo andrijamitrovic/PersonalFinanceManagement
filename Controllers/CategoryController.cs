@@ -26,7 +26,7 @@ namespace PersonalFinanceManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategoriesAsync([FromQuery] string? parentId = null)
+        public async Task<IActionResult> GetCategoriesAsync([FromQuery(Name = "parent-id")] string? parentId = null)
         {
             var categories = await _categoryService.GetCategoriesAsync(parentId);
             return Ok(new CategoryList
@@ -39,9 +39,9 @@ namespace PersonalFinanceManagement.Controllers
         [Route("import")]
         public async Task<IActionResult> ImportCategoriesAsync(IFormFile file)
         {
-            var badTransactions = await _categoryService.ImportCategoriesAsync(file);
+            var badCategories = await _categoryService.ImportCategoriesAsync(file);
 
-            return File(Encoding.UTF8.GetBytes(badTransactions), "text/plain", "badCategories.txt");
+            return File(Encoding.UTF8.GetBytes(badCategories), "text/plain", "badCategories.txt");
         }
     }
 }

@@ -54,13 +54,18 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateOnly? startDate, DateOnly? endDate, Direction? direction)
         {
             var analytics = new List<SpendingAnalytics>();
 
             if (!string.IsNullOrEmpty(catcode))
             {
+                var childCategories = _dbContext.Categories.Where(c => c.ParentCode == catcode);
                 analytics.Add(await GetSpendingAnalyticsForACategoryAsync(catcode, startDate, endDate, direction));
+                foreach (var childCategory in childCategories)
+                {
+                    analytics.Add(await GetSpendingAnalyticsForACategoryAsync(childCategory.Code, startDate, endDate, direction));
+                }
             }
             else
             {
@@ -74,7 +79,7 @@ namespace PersonalFinanceManagement.Database.Repositories.CategoryRepositories
             return analytics;
         }
 
-        private async Task<SpendingAnalytics> GetSpendingAnalyticsForACategoryAsync(string catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        private async Task<SpendingAnalytics> GetSpendingAnalyticsForACategoryAsync(string catcode, DateOnly? startDate, DateOnly? endDate, Direction? direction)
         {
             var listOfCatCodes = new List<string> { catcode };
             listOfCatCodes.AddRange(await GetAllCategoriesByCatCode(catcode));

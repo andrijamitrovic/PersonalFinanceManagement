@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using PersonalFinanceManagement.Database.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace PersonalFinanceManagement.Models.TransactionModels
@@ -18,5 +19,6 @@ namespace PersonalFinanceManagement.Models.TransactionModels
         public Kind Kind { get; set; }
         [Ignore]
         public string? Catcode { get; set; }
+        public ICollection<TransactionSplit>? Splits { get; set; }
     }
 }

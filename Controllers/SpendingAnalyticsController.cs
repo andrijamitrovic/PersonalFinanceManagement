@@ -24,9 +24,24 @@ namespace PersonalFinanceManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSpendingAnalyticsAsync([FromQuery] string? catcode, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] Direction? direction)
+        public async Task<IActionResult> GetSpendingAnalyticsAsync([FromQuery] string? catcode, [FromQuery(Name = "start-date")] string? startDate, [FromQuery(Name = "end-date")] string? endDate, [FromQuery] string? direction)
         {
-            var groups = await _categoryService.GetSpendingAnalyticsAsync(catcode, startDate, endDate, direction);
+            Direction? _direction = null;
+            if (direction != null)
+            {
+                _direction = Enum.Parse<Direction>(direction, ignoreCase: true);
+            }
+            DateOnly? _startDate = null;
+            if (startDate != null)
+            {
+                _startDate = DateOnly.ParseExact(startDate, "M/d/yyyy");
+            }
+            DateOnly? _endDate = null;
+            if (endDate != null)
+            {
+                _endDate = DateOnly.ParseExact(endDate, "M/d/yyyy");
+            }
+            var groups = await _categoryService.GetSpendingAnalyticsAsync(catcode, _startDate, _endDate, _direction);
             return Ok(new SpendingByCategory
             {
                 Groups = groups

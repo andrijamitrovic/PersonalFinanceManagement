@@ -32,7 +32,7 @@ namespace PersonalFinanceManagement.Services.CategoryServices
             return categories.Select(c => _mapper.Map<Category>(c)).ToList();
         }
 
-        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        public async Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateOnly? startDate, DateOnly? endDate, Direction? direction)
         {
             return await _categoryRepository.GetSpendingAnalyticsAsync(catcode, startDate, endDate, direction);
         }

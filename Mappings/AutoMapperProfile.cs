@@ -13,12 +13,14 @@ namespace PersonalFinanceManagement.Mappings
         public AutoMapperProfile()
         {
             CreateMap<TransactionEntity, Transaction>()
-                .ForMember(x => x.Date, y => y.MapFrom(z => z.Date.ToString()));
+                .ForMember(x => x.Date, y => y.MapFrom(z => z.Date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)));
             CreateMap<Transaction, TransactionEntity>()
-                .ForMember(x => x.Date, y => y.MapFrom(z => DateTime.Parse(z.Date)));
+                .ForMember(x => x.Date, y => y.MapFrom(z => DateOnly.Parse(z.Date)));
             CreateMap<PagedSortedFilteredList<TransactionEntity>, PagedSortedFilteredList<Transaction>>();
             CreateMap<CategoryEntity, Category>();
             CreateMap<Category, CategoryEntity>();
+            CreateMap<TransactionSplit, TransactionSplitEntity>();
+            CreateMap<TransactionSplitEntity, TransactionSplit>();
         }
     }
 }

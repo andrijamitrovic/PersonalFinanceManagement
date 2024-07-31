@@ -1,0 +1,29 @@
+{
+  "Rules": [
+    {
+      "Title": "When mcc is 5811 (Caterers) categorize transaction as 39 (Food & Dining / Restaurants)",
+      "Catcode": "'U'",
+      "Predicate": "\"Mcc\" = 'Caterers'"
+    },
+    {
+      "Title": "",
+      "Catcode": "'C'",
+      "Predicate": "\"Description\" LIKE '%bill%'"
+    },
+    {
+      "Title": "",
+      "Catcode": "'F'",
+      "Predicate": "\"Description\" LIKE '%fee%'"
+    },
+    {
+      "Title": "",
+      "Catcode": "'P'",
+      "Predicate": "\"BeneficiaryName\" LIKE '%Lidl%' OR \"BeneficiaryName\" LIKE '%Delhaize%'"
+    },
+    {
+      "Title": "",
+      "Catcode": "'O'",
+      "Predicate": "\"BeneficiaryName\" LIKE '%Pet%' OR \"Description\" LIKE '%Pet%'"
+    }
+  ]
+}

@@ -41,12 +41,10 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             return badTransactions;
         }
 
-        public async Task<PagedSortedFilteredList<TransactionEntity>> GetTransactionsAsync(List<Kind>? transactionKind, DateTime? startDate, DateTime? endDate, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc, string? sortBy = null)
+        public async Task<PagedSortedFilteredList<TransactionEntity>> GetTransactionsAsync(List<Kind>? transactionKind, DateOnly? startDate, DateOnly? endDate, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc, string? sortBy = null)
         {
 
             var query = _dbContext.Transactions.AsQueryable();
-            var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling(totalCount * 1.0 / pageSize);
 
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -55,11 +53,17 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
                     case "amount":
                         query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Amount) : query.OrderByDescending(x => x.Amount);
                         break;
+                    case "id":
+                        query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Id) : query.OrderByDescending(x => x.Id);
+                        break;
                     case "beneficiary-name":
                         query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.BeneficiaryName) : query.OrderByDescending(x => x.BeneficiaryName);
                         break;
                     case "description":
                         query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Description) : query.OrderByDescending(x => x.Description);
+                        break;
+                    case "date":
+                        query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Date) : query.OrderByDescending(x => x.Date);
                         break;
                 }
             }
@@ -67,21 +71,26 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             {
                 query = query.OrderBy(x => x.Amount);
             }
-            if (transactionKind?.Any() == true)
+            if (transactionKind?.Count == 0)
             {
                 query = query.Where(x => transactionKind.Contains(x.Kind));
             }
             if (startDate != null)
             {
-                query = query.Where(x => x.Date > startDate);
+                query = query.Where(x => x.Date >= startDate);
             }
             if (endDate != null)
             {
-                query = query.Where(x => x.Date < endDate);
+                query = query.Where(x => x.Date <= endDate);
             }
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            var products = await query.Include(x => x.TransactionSplits).ToListAsync();
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling(totalCount * 1.0 / pageSize);
+            if (totalPages == 0)
+                totalPages++;
+
+            var transactions = await query.Include(x => x.TransactionSplits).ToListAsync();
 
             return new PagedSortedFilteredList<TransactionEntity>
             {
@@ -91,7 +100,7 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
                 PageSize = pageSize,
                 SortBy = sortBy,
                 SortOrder = sortOrder,
-                Items = products
+                Items = transactions
             };
         }
 
@@ -189,6 +198,14 @@ namespace PersonalFinanceManagement.Database.Repositories.TransactionRepositorie
             await _dbContext.SaveChangesAsync();
 
             return null;
+        }
+
+        public async Task AutoCategorizeTransactionAsync(AutoCategorizeRuleList<Rule> rules)
+        {
+            foreach (var rule in rules.Rules)
+            {
+                await _dbContext.Database.ExecuteSqlRawAsync("UPDATE public.transactions SET \"CatCode\" =" + rule.Catcode + " WHERE " + rule.Predicate);
+            }
         }
     }
 }

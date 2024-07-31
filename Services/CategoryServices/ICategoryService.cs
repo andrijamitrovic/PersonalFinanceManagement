@@ -8,6 +8,6 @@ namespace PersonalFinanceManagement.Services.CategoryServices
     {
         Task<string> ImportCategoriesAsync(IFormFile file);
         Task<List<Category>> GetCategoriesAsync(string? parentCategory);
-        Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateTime? startDate, DateTime? endDate, Direction? direction);
+        Task<List<SpendingAnalytics>> GetSpendingAnalyticsAsync(string? catcode, DateOnly? startDate, DateOnly? endDate, Direction? direction);
     }
 }
